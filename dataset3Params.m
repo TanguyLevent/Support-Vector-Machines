@@ -23,12 +23,26 @@ sigma = 0.3;
 %        mean(double(predictions ~= yval))
 %
 
+matrix_error = zeros(64,3);
+row = 0;
 
+for C_test = [0.01 0.03 0.1 0.3 1 3 10 30]
 
+  for sigma_test = [0.01 0.03 0.1 0.3 1 3 10 30]
+  
+    row = row + 1;
+    fit_train = svmTrain(X,y, C_test, @(x1,x2) gaussianKernel(x1,x2,sigma_test));
+    cross_validation = svmPredict(fit_train, Xval);
+    
+    cv_error = mean(double(cross_validation ~= yval));
+    
+    matrix_error(row, : ) = [C_test, sigma_test, cv_error];
 
+end
 
+sort_error = sortrows(matrix_error, 3);
 
-
-% =========================================================================
+C = sort_error(1,1);
+sigma = sort_error(1,2);
 
 end
